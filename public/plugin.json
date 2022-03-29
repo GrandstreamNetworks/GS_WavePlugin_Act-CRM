@@ -1,0 +1,11 @@
+{
+  "name": "Act! CRM",
+  "version": "1.0.0.5",
+  "description": "Act! CRM combines marketing automation and sales channel management into a centralized platform. With this integration, Wave users can obtain customer information from Act! CRM for improved services.",
+  "icon": "/act_logo.png",
+  "permissions": [
+    "call.listen",
+    "call.dial"
+  ],
+  "plugin_type": "background"
+}

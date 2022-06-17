@@ -3,7 +3,7 @@ import { connect, useIntl, history } from 'umi';
 import { Row, Col, Button } from 'antd'
 import moment from 'moment-timezone';
 import { ConnectError, ConnectState, Footer, SwitchBtn } from '@/components';
-import { ACT_CRM_URL, DATE_FORMAT, EVENT_KEY, WAVE_CALL_TYPE } from '@/constant';
+import { ACT_CRM_URL, DATE_FORMAT, EVENT_KEY} from '@/constant';
 import { getNotificationBody } from '@/utils/utils';
 import styles from './index.less'
 
@@ -137,9 +137,12 @@ const HomePage = ({ getContact, putInteraction, userConfig, saveUserConfig }) =>
          */
         pluginSDK.eventEmitter.on(EVENT_KEY.rejectP2PCall, function ({ callType, callNum }) {
             console.log('onRejectP2PCall', callType, callNum);
-            uploadCallInfo(callNum, 0, 0, WAVE_CALL_TYPE.in);
+            uploadCallInfo(callNum, 0, 0);
             if (callNumber.current === callNum) {
-                pluginSDK.hideNotification();
+                setTimeout(() => {
+                    // @ts-ignore
+                    pluginSDK.hideNotification();
+                }, 1000)
             }
         })
 
@@ -149,19 +152,24 @@ const HomePage = ({ getContact, putInteraction, userConfig, saveUserConfig }) =>
          */
         pluginSDK.eventEmitter.on(EVENT_KEY.hangupP2PCall, function (data) {
             console.log('onHangupP2PCall', data);
-            let { callNum, callStartTimeStamp, callEndTimeStamp, callDirection } = data
-            callDirection = callDirection === 'in' ? WAVE_CALL_TYPE.in : WAVE_CALL_TYPE.out;
-            uploadCallInfo(callNum, callStartTimeStamp ?? 0, callEndTimeStamp ?? 0, callDirection);
+            let { callNum, callStartTimeStamp, callEndTimeStamp} = data
+            uploadCallInfo(callNum, callStartTimeStamp ?? 0, callEndTimeStamp ?? 0);
             if (callNumber.current === callNum) {
-                pluginSDK.hideNotification();
+                setTimeout(() => {
+                    // @ts-ignore
+                    pluginSDK.hideNotification();
+                }, 1000)
             }
         })
 
         pluginSDK.eventEmitter.on(EVENT_KEY.p2PCallCanceled, function ({ callType, callNum }) {
             console.log('p2PCallCanceled', callType, callNum);
-            uploadCallInfo(callNum, 0, 0, WAVE_CALL_TYPE.miss);
+            uploadCallInfo(callNum, 0, 0);
             if (callNumber.current === callNum) {
-                pluginSDK.hideNotification();
+                setTimeout(() => {
+                    // @ts-ignore
+                    pluginSDK.hideNotification();
+                }, 1000)
             }
         })
 

@@ -14,7 +14,6 @@ import styles from './index.less';
  * @param getUser 获取当前登录用户
  * @param saveUserConfig
  * @param loginLoading loginLoading : boolean 加载状态 def:false
- * @returns {JSX.Element}
  * @constructor
  */
 const IndexPage = ({ getUser, saveUserConfig, loginLoading = false }) => {
@@ -136,7 +135,7 @@ const IndexPage = ({ getUser, saveUserConfig, loginLoading = false }) => {
                     </div>
                 </Form>
             </div>
-            <Footer url="" message={formatMessage({ id: 'login.user.guide' })} />
+            <Footer url="https://documentation.grandstream.com/knowledge-base/wave-crm-add-ins/#overview" message={formatMessage({ id: 'login.user.guide' })} />
         </>
     );
 };

@@ -1,53 +1,39 @@
-import React, { useEffect, useRef } from 'react';
-import { connect, useIntl, history } from 'umi';
-import { Row, Col, Button } from 'antd'
-import moment from 'moment-timezone';
-import { ConnectError, ConnectState, Footer, SwitchBtn } from '@/components';
-import { ACT_CRM_URL, DATE_FORMAT, EVENT_KEY} from '@/constant';
-import { getNotificationBody } from '@/utils/utils';
+import React, { useCallback } from 'react'
+import { connect, useIntl } from 'umi'
+import moment from 'moment-timezone'
+import { CallAction, ConfigBlock, ConnectError, ConnectState, Footer } from '@/components'
+import { ACT_CRM_URL, DATE_FORMAT } from '@/constant'
+import { getNotificationBody, getValueByConfig } from '@/utils/utils'
 import styles from './index.less'
 
-const HomePage = ({ getContact, putInteraction, userConfig, saveUserConfig }) => {
-    const { formatMessage } = useIntl();
-
-    const callNumber = useRef(null);
-
-    /**
-     * 登出
-     */
-    const logoutClick = () => {
-        const config = JSON.parse(JSON.stringify(userConfig));
-        config.autoLogin = false;
-        config.username = undefined;
-        saveUserConfig(config);
-        history.replace({ pathname: '/login' });
-    };
+const HomePage = ({ getContact, putInteraction, showConfig, uploadCall }) => {
+    const { formatMessage } = useIntl()
 
     const getContactByCallNum = callNum => {
-        callNum = callNum.replace(/\b(0+)/gi, '');
+        callNum = callNum.replace(/\b(0+)/gi, '')
         const params = {
             $filter: `mobilePhone eq ${callNum} or homePhone eq ${callNum} or businessPhone eq ${callNum}`
         }
-        return getContact(params);
+        return getContact(params)
     }
 
     /**
      * 记录通话
      */
-    const uploadCallInfo = (callNum, callStartTimeStamp, callEndTimeStamp) => {
-        if (!userConfig.uploadCall) {
-            return;
+    const uploadCallInfo = useCallback((callNum, callStartTimeStamp, callEndTimeStamp) => {
+        if (!uploadCall) {
+            return
         }
-        callNum = callNum.replace(/\b(0+)/gi, '');
+        callNum = callNum.replace(/\b(0+)/gi, '')
         getContactByCallNum(callNum).then(contactInfo => {
             if (!contactInfo?.id) {
-                return;
+                return
             }
             const params = {
                 type: 'Call',
-                subject: `${contactInfo.firstName + contactInfo.lastName}'s calls`,
+                subject: `${contactInfo.firstName ?? ''} ${contactInfo.lastName ?? ''}'s calls`,
                 contacts: [{
-                    id: contactInfo.id, displayName: contactInfo.firstName + contactInfo.lastName
+                    id: contactInfo.id, displayName: `${contactInfo.firstName ?? ''} ${contactInfo.lastName ?? ''}`
                 }],
                 startTime: moment(callStartTimeStamp || undefined).format(DATE_FORMAT.format_2) + 'Z',
                 endTime: moment(callEndTimeStamp || undefined).format(DATE_FORMAT.format_2) + 'Z',
@@ -55,9 +41,9 @@ const HomePage = ({ getContact, putInteraction, userConfig, saveUserConfig }) =>
                 timeZone: moment.tz.guess(),
                 isCompleted: true,
             }
-            putInteraction(params);
+            putInteraction(params)
         })
-    }
+    }, [uploadCall])
 
     /**
      * 跳转至ACT CRM系统
@@ -66,9 +52,9 @@ const HomePage = ({ getContact, putInteraction, userConfig, saveUserConfig }) =>
      */
     const getUrl = contact => {
         if (contact?.id) {
-            return `${ACT_CRM_URL}/${contact.id}`;
+            return `${ACT_CRM_URL}/${contact.id}`
         }
-        return `${ACT_CRM_URL}/new`;
+        return `${ACT_CRM_URL}/new`
     }
 
     /**
@@ -76,151 +62,108 @@ const HomePage = ({ getContact, putInteraction, userConfig, saveUserConfig }) =>
      * 调用wave接口，打开通知窗口，展示信息
      * @param callNum 号码
      */
-    const initCallInfo = (callNum) => {
+    const initCallInfo = useCallback((callNum) => {
         getContactByCallNum(callNum).then(contact => {
             if (!contact?.displayNotification) {
-                return;
+                return
             }
-            const name = contact?.firstName + contact?.lastName;
-            const url = getUrl(contact);
-            const pluginPath = sessionStorage.getItem('pluginPath');
+            const url = getUrl(contact)
+            const pluginPath = sessionStorage.getItem('pluginPath')
+
+            // body对象，
             const body = {
                 logo: `<div style="margin-bottom: 12px"><img src="${pluginPath}/ACT.svg" alt=""/> ACT! CRM</div>`,
-                info: name ? `<div style="font-weight: bold; text-overflow: ellipsis; white-space:nowrap; overflow: hidden">${contact.firstName + contact.lastName}</div>` : null,
-                PhoneNumber: `<div style="font-weight: bold; text-overflow: ellipsis; white-space:nowrap; overflow: hidden">${callNum}</div>`,
-                title: contact?.jobTitle ? `<div style="font-weight: bold; text-overflow: ellipsis; white-space:nowrap; overflow: hidden">${contact?.jobTitle}</div>` : null,
-                action: `<div style="margin-top: 10px;display: flex;justify-content: flex-end;"><button style="background: none; border: none;">
+            }
+
+            // 根据自定义信息，添加body属性
+            if (contact?.id) {
+                // 将showConfig重复的删除
+                const configList = [...new Set(Object.values(showConfig))]
+                console.log(configList)
+                for (const key in configList) {
+                    console.log(configList[key])
+                    if (!configList[key]) {
+                        continue
+                    }
+
+                    // 取出联系人的信息用于展示
+                    const configValue = getValueByConfig(contact, configList[key])
+                    console.log(configValue)
+                    if (configList[key] === 'Phone') {
+                        Object.defineProperty(body, `config_${key}`, {
+                            value: `<div style="font-weight: bold">${callNum}</div>`,
+                            writable: true,
+                            enumerable: true,
+                            configurable: true
+                        })
+                    }
+                    else if (configValue) {
+                        Object.defineProperty(body, `config_${key}`, {
+                            value: `<div style="font-weight: bold; display: -webkit-box;-webkit-box-orient: vertical;-webkit-line-clamp: 5;overflow: hidden;">${configValue}</div>`,
+                            writable: true,
+                            enumerable: true,
+                            configurable: true
+                        })
+                    }
+                }
+            }
+            else {
+                Object.defineProperty(body, 'phone', {
+                    value: `<div style="font-weight: bold;">${callNum}</div>`,
+                    writable: true,
+                    enumerable: true,
+                    configurable: true
+                })
+            }
+
+            Object.defineProperty(body, 'action', {
+                value: `<div style="margin-top: 10px;display: flex;justify-content: flex-end;"><button style="background: none; border: none;">
                              <a href=${url} target="_blank" style="color: #62B0FF">
                                  ${contact?.id ? formatMessage({ id: 'home.detail' }) : formatMessage({ id: 'home.edit' })}
                              </a>
-                         </button></div>`
-            }
-            console.log('displayNotification');
+                         </button></div>`, writable: true, enumerable: true, configurable: true
+            })
+
+            console.log('displayNotification')
             pluginSDK.displayNotification({
                 notificationBody: getNotificationBody(body),
             })
         })
-    }
+    }, [showConfig])
 
-    useEffect(() => {
-        /**
-         * 监听收到语音/视频来电
-         * 回调函数参数：callType,callNum
-         */
-        pluginSDK.eventEmitter.on(EVENT_KEY.recvP2PIncomingCall, function ({ callType, callNum }) {
-            console.log('onRecvP2PIncomingCall', callType, callNum);
-            callNumber.current = callNum
-            initCallInfo(callNum);
-        })
-
-        /**
-         * 监听wave发起语音/视频
-         * 回调函数参数：callType,callNum
-         */
-        pluginSDK.eventEmitter.on(EVENT_KEY.initP2PCall, function ({ callType, callNum }) {
-            console.log('onHangupP2PCall', callType, callNum);
-            callNumber.current = callNum
-            initCallInfo(callNum);
-        })
-
-        return function cleanup() {
-            pluginSDK.eventEmitter.off(EVENT_KEY.recvP2PIncomingCall);
-
-            pluginSDK.eventEmitter.off(EVENT_KEY.initP2PCall);
-        }
-    }, [])
-
-    useEffect(() => {
-        /**
-         * 监听拒绝语音/视频
-         * 回调函数参数：callType,callNum
-         */
-        pluginSDK.eventEmitter.on(EVENT_KEY.rejectP2PCall, function ({ callType, callNum }) {
-            console.log('onRejectP2PCall', callType, callNum);
-            uploadCallInfo(callNum, 0, 0);
-            if (callNumber.current === callNum) {
-                setTimeout(() => {
-                    // @ts-ignore
-                    pluginSDK.hideNotification();
-                }, 1000)
-            }
-        })
-
-        /**
-         * 监听挂断语音/视频
-         * 回调函数参数：callType,callNum
-         */
-        pluginSDK.eventEmitter.on(EVENT_KEY.hangupP2PCall, function (data) {
-            console.log('onHangupP2PCall', data);
-            let { callNum, callStartTimeStamp, callEndTimeStamp} = data
-            uploadCallInfo(callNum, callStartTimeStamp ?? 0, callEndTimeStamp ?? 0);
-            if (callNumber.current === callNum) {
-                setTimeout(() => {
-                    // @ts-ignore
-                    pluginSDK.hideNotification();
-                }, 1000)
-            }
-        })
-
-        pluginSDK.eventEmitter.on(EVENT_KEY.p2PCallCanceled, function ({ callType, callNum }) {
-            console.log('p2PCallCanceled', callType, callNum);
-            uploadCallInfo(callNum, 0, 0);
-            if (callNumber.current === callNum) {
-                setTimeout(() => {
-                    // @ts-ignore
-                    pluginSDK.hideNotification();
-                }, 1000)
-            }
-        })
-
-        return function cleanup() {
-            pluginSDK.eventEmitter.off(EVENT_KEY.rejectP2PCall);
-
-            pluginSDK.eventEmitter.off(EVENT_KEY.hangupP2PCall);
-
-            pluginSDK.eventEmitter.off(EVENT_KEY.p2PCallCanceled);
-        }
-
-    }, [userConfig])
-
-    return (
-        <>
-            <ConnectError />
-            <div className={styles.homePage}>
-                <ConnectState />
-                <div className={styles.callConfig}>
-                    <Row>
-                        <Col span={19}>
-                            <span className={styles.spanLabel}>{formatMessage({ id: 'home.Synchronize' })}</span>
-                        </Col>
-                        <Col span={4}>
-                            <SwitchBtn />
-                        </Col>
-                    </Row>
-                </div>
-                <Button onClick={logoutClick}>{formatMessage({ id: 'home.logout' })}</Button>
-            </div>
-            <Footer url="https://app.act365.com" message={formatMessage({ id: 'home.toCRM ' })} />
-        </>
-    )
+    return (<>
+        <CallAction uploadCallInfo={uploadCallInfo} initCallInfo={initCallInfo} />
+        <ConnectError />
+        <div className={styles.homePage}>
+            <ConnectState />
+            <ConfigBlock />
+        </div>
+        <Footer url="https://app.act365.com" message={formatMessage({ id: 'home.toCRM' })} />
+    </>)
 }
 
-export default connect(({ global }) => ({
-    userConfig: global.userConfig, user: global.user, connectState: global.connectState
-}), (dispatch) => ({
-    getContact: payload => dispatch({
-        type: 'home/getContact', payload,
+export default connect(
+    ({ global }) => ({
+        user: global.user,
+        connectState: global.connectState,
+        uploadCall: global.uploadCall,
+        showConfig: global.showConfig,
     }),
-    putInteraction: payload => dispatch({
-        type: 'home/putInteraction', payload,
-    }),
-    saveUserConfig: payload => dispatch({
-        type: 'global/saveUserConfig', payload,
-    }),
-    save: payload => dispatch({
-        type: 'global/save', payload,
-    }),
-    getUser: payload => dispatch({
-        type: 'global/getUser', payload
-    }),
-}))(HomePage);
+    (dispatch) => ({
+        getContact: payload => dispatch({
+            type: 'home/getContact', payload,
+        }),
+        putInteraction: payload => dispatch({
+            type: 'home/putInteraction', payload,
+        }),
+        saveUserConfig: payload => dispatch({
+            type: 'global/saveUserConfig', payload,
+        }),
+        save: payload => dispatch({
+            type: 'global/save', payload,
+        }),
+        getUser: payload => dispatch({
+            type: 'global/getUser', payload
+        }),
+    })
+)(HomePage)

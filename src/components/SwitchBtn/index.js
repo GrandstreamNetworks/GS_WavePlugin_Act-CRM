@@ -3,38 +3,28 @@ import { Switch } from 'antd';
 import { connect } from 'umi';
 import styles from './index.less'
 
-const IndexPage = ({ userConfig, saveUserConfig, connectState }) => {
+const IndexPage = ({ uploadCall, uploadCallChange, connectState }) => {
 
     /**
-      * 同步通话记录的开关
-      * @param {boolean} checked 
-      */
+     * 同步通话记录的开关
+     * @param {boolean} checked
+     */
     const onSwitchChange = checked => {
-        const config = JSON.parse(JSON.stringify(userConfig));
-        config.uploadCall = checked;
-        saveUserConfig(config);
+        uploadCallChange(checked);
     }
 
-    return (
-        <div className={styles.switch}>
+    return (<div className={styles.switch}>
             <Switch
-                checked={userConfig.uploadCall}
+                checked={uploadCall}
                 onChange={onSwitchChange}
                 disabled={connectState !== 'SUCCESS'} />
-        </div>
-    )
+        </div>)
 }
 
-export default connect(
-    ({ global }) => ({
-        userConfig: global.userConfig,
-        connectState: global.connectState,
-    }),
-    (dispatch) => ({
-        saveUserConfig: (payload) =>
-            dispatch({
-                type: 'global/saveUserConfig',
-                payload,
-            })
+export default connect(({ global }) => ({
+    uploadCall: global.uploadCall, connectState: global.connectState,
+}), (dispatch) => ({
+    uploadCallChange: (payload) => dispatch({
+        type: 'global/uploadCallChange', payload,
     })
-)(IndexPage);
+}))(IndexPage);

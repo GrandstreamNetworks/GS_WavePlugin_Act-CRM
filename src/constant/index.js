@@ -2,7 +2,7 @@
 const ACT_CRM_URL = `https://app.act365.com/#/people/contacts/all`
 
 // ACT_CRM 开发者密钥
-const ACT_DEVELOP_KEY = 'fc4a0aae5fceee3f975bf79f19e54ee4';
+const ACT_DEVELOP_KEY = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxx';
 
 /**
  * 全局消息弹窗属性
@@ -43,8 +43,7 @@ const REQUEST_CODE = {
  * @type {{userInfo: string, token: string}}
  */
 const SESSION_STORAGE_KEY = {
-    token: 'token',
-    userInfo: 'userInfo',
+    token: 'token', userInfo: 'userInfo',
 }
 
 /**
@@ -62,15 +61,39 @@ const EVENT_KEY = {
 }
 
 const WAVE_CALL_TYPE = {
-    in: 'Inbound',
-    out: 'Outbound',
-    miss: 'Missed',
+    in: 'Inbound', out: 'Outbound', miss: 'Missed',
 }
 
 const DATE_FORMAT = {
-    format_1: 'YYYY/MM/DD',
-    format_2: 'YYYY-MM-DDTHH:mm:ss.SSS',
-    format_3: 'YYYY/MM/DD HH/mm/ss.SSS',
+    format_1: 'YYYY/MM/DD', format_2: 'YYYY-MM-DDTHH:mm:ss.SSS', format_3: 'YYYY/MM/DD HH/mm/ss.SSS',
 };
 
-export { ACT_CRM_URL, ACT_DEVELOP_KEY, GLOBAL_MESSAGE, REQUEST_CODE, SESSION_STORAGE_KEY, EVENT_KEY, WAVE_CALL_TYPE, DATE_FORMAT };
+const CONFIG_SHOW = {
+    None: undefined,
+    Name: ['firstName', 'lastName'],
+    Phone: "Phone",
+    Email: 'emailAddress',
+    Company: 'company',
+    Title: 'jobTitle',
+}
+
+const NotificationConfig = {
+    first: 'information 1',
+    second: 'information 2',
+    third: 'information 3',
+    forth: 'information 4',
+    fifth: 'information 5'
+}
+
+export {
+    ACT_CRM_URL,
+    ACT_DEVELOP_KEY,
+    GLOBAL_MESSAGE,
+    REQUEST_CODE,
+    SESSION_STORAGE_KEY,
+    EVENT_KEY,
+    WAVE_CALL_TYPE,
+    DATE_FORMAT,
+    CONFIG_SHOW,
+    NotificationConfig
+};

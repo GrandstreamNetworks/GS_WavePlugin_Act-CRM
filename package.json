@@ -22,7 +22,6 @@
   "dependencies": {
     "@ant-design/icons": "^4.7.0",
     "@ant-design/pro-layout": "^6.5.0",
-    "antd": "^4.17.2",
     "js-base64": "^3.7.2",
     "lodash": "^4.17.21",
     "moment": "^2.29.1",

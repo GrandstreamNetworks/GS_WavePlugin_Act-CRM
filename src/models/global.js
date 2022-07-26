@@ -4,7 +4,7 @@ import { getUser } from '@/services/global';
 
 export default {
     namespace: 'global', state: {
-        user: {}, userConfig: {}, connectState: 'SUCCESS', uploadCall: true, showConfig: {},
+        user: {}, userConfig: {}, connectState: 'SUCCESS', uploadCall: true, showConfig: {}, callState: new Map(),
     },
 
     effects: {

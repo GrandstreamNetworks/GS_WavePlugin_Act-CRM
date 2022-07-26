@@ -2,7 +2,7 @@
 const ACT_CRM_URL = `https://app.act365.com/#/people/contacts/all`
 
 // ACT_CRM 开发者密钥
-const ACT_DEVELOP_KEY = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxx';
+const ACT_DEVELOP_KEY = 'fc4a0aae5fceee3f975bf79f19e54ee4';
 
 /**
  * 全局消息弹窗属性

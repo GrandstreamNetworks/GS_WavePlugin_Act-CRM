@@ -29,7 +29,7 @@ export default defineConfig({
     },
     routes,
     theme: {
-        'primary-color': '#1890ff',
+        'primary-color': '#3F8EF0',
     },
     title: false,
     ignoreMomentLocale: true,
@@ -43,6 +43,7 @@ export default defineConfig({
     fastRefresh: {},
     webpack5: {},
     chainWebpack(memo) {
+        memo.output.hashFunction('md4');
         memo.output.filename('js/[name].[hash:8].js');
         memo.output.chunkFilename('js/[name].[hash:8].js');
         memo.plugin('extract-css').tap(args => [

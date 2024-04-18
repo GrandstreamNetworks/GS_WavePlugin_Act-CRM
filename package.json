@@ -20,28 +20,26 @@
     ]
   },
   "dependencies": {
-    "@ant-design/icons": "^4.7.0",
     "@ant-design/pro-layout": "^6.5.0",
-    "js-base64": "^3.7.2",
+    "@types/lodash": "^4.14.194",
+    "@types/qs": "^6.9.7",
+    "js-base64": "^3.7.5",
+    "libphonenumber-js": "^1.10.49",
     "lodash": "^4.17.21",
-    "moment": "^2.29.1",
-    "moment-timezone": "^0.5.34",
-    "qs": "^6.10.1",
+    "moment-timezone": "^0.5.43",
+    "qs": "^6.11.1",
     "react": "17.x",
     "react-dom": "17.x",
-    "umi": "^3.5.20"
+    "umi": "^3.5.26"
   },
   "devDependencies": {
-    "@types/lodash": "^4.14.178",
-    "@types/qs": "^6.9.7",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
     "@umijs/preset-react": "1.x",
-    "@umijs/test": "^3.5.20",
+    "@umijs/test": "^3.5.26",
     "lint-staged": "^10.0.7",
     "prettier": "^2.2.0",
     "typescript": "^4.1.2",
-    "umi-request": "^1.4.0",
     "yorkie": "^2.0.0"
   }
 }

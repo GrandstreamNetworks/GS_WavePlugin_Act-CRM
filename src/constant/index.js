@@ -1,8 +1,17 @@
 // ACT_CRM 联系人模块url地址
-const ACT_CRM_URL = `https://app.act365.com/#/people/contacts/all`
+const ACT_CRM_URL = `https://my.act.com`
+
+const ACT_CRM_ADDRESS = {
+    US: "https://apius.act.com",
+    UK: "https://apiuk.act.com",
+    'AUS/NZ': 'https://apiau.act.com',
+    EU: 'https://apieu.act.com'
+}
 
 // ACT_CRM 开发者密钥
 const ACT_DEVELOP_KEY = 'fc4a0aae5fceee3f975bf79f19e54ee4';
+
+const LOGIN_KEYS = ['username', 'password', 'dataBase', 'serverAddress']
 
 /**
  * 全局消息弹窗属性
@@ -40,10 +49,12 @@ const REQUEST_CODE = {
 
 /**
  * sessionStorage key
- * @type {{userInfo: string, token: string}}
  */
 const SESSION_STORAGE_KEY = {
-    token: 'token', userInfo: 'userInfo',
+    token: 'token',
+    userInfo: 'userInfo',
+    serverAddress: 'serverAddress',
+    dataBase: 'dataBase',
 }
 
 /**
@@ -58,14 +69,20 @@ const EVENT_KEY = {
     initP2PCall: 'onInitP2PCall', // wave发去呼叫
     p2PCallCanceled: 'onP2PCallCanceled', // 未接来电、去电
     initPluginWindowOk: 'onInitPluginWindowOk', //初始化窗口成功
+    onViewCustomerInfos: 'onViewCustomerInfos' // 收到客户信息
 }
 
 const WAVE_CALL_TYPE = {
-    in: 'Inbound', out: 'Outbound', miss: 'Missed',
+    in: 'Inbound',
+    out: 'Outbound',
+    miss: 'Missed',
 }
 
 const DATE_FORMAT = {
-    format_1: 'YYYY/MM/DD', format_2: 'YYYY-MM-DDTHH:mm:ss.SSS', format_3: 'YYYY/MM/DD HH/mm/ss.SSS',
+    format_1: 'YYYY/MM/DD',
+    format_2: 'YYYY-MM-DDTHH:mm:ssZ',
+    format_3: 'YYYY/MM/DD HH/mm/ssZ',
+    format_4: 'HH:mm:ss',
 };
 
 const CONFIG_SHOW = {
@@ -78,22 +95,45 @@ const CONFIG_SHOW = {
 }
 
 const NotificationConfig = {
-    first: 'information 1',
-    second: 'information 2',
-    third: 'information 3',
-    forth: 'information 4',
-    fifth: 'information 5'
+    first: 'Information 1',
+    second: 'Information 2',
+    third: 'Information 3',
+    forth: 'Information 4',
+    fifth: 'Information 5'
 }
 
+const BASE_URL = '/act.web.api';
+
+const NOTIFICATION_CONFIG_DEF = {
+    first: 'Name',
+    second: 'Phone',
+    third: 'None',
+    forth: 'None',
+    fifth: 'None',
+}
+
+const AUTO_CREATE_CONFIG_DEF = {
+    numberType: 'Wave',
+    direction: 'All',
+    entityType: 'Contact',
+    firstName: 'Wave [Number]',
+    lastName: 'New',
+}
+
+const UPLOAD_CALL_CONFIG_DEF = {
+    subject: 'Wave PhoneSystem Call',
+    Inbound: '[DateTime]: Incoming call from [Number] [Name] to [Agent]([Duration])',
+    Missed: '[DateTime]: Missed call from [Number] [Name] to [Agent]',
+    Outbound: '[DateTime]: Outgoing call from [Agent] to [Number] [Name] ([Duration])',
+    unansweredOutbound: '[DateTime]: Unanswered outgoing call from [Agent] to [Number] [Name]'
+}
+
+const CREATION_CONFIG_CONTACT_TYPE = [
+    'Contact'
+]
+
 export {
-    ACT_CRM_URL,
-    ACT_DEVELOP_KEY,
-    GLOBAL_MESSAGE,
-    REQUEST_CODE,
-    SESSION_STORAGE_KEY,
-    EVENT_KEY,
-    WAVE_CALL_TYPE,
-    DATE_FORMAT,
-    CONFIG_SHOW,
-    NotificationConfig
+    ACT_CRM_ADDRESS, LOGIN_KEYS, ACT_CRM_URL, ACT_DEVELOP_KEY, AUTO_CREATE_CONFIG_DEF, BASE_URL, CONFIG_SHOW, CREATION_CONFIG_CONTACT_TYPE, DATE_FORMAT, EVENT_KEY, GLOBAL_MESSAGE, NOTIFICATION_CONFIG_DEF, NotificationConfig, REQUEST_CODE,
+    SESSION_STORAGE_KEY, UPLOAD_CALL_CONFIG_DEF, WAVE_CALL_TYPE
 };
+
